@@ -20,14 +20,18 @@ public class WebBoardServiceImpl implements WebBoardService {
 	}
 	
 	@Override
-	public void findOne() throws Exception {
+	public void findOne() {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public Page<WebBoard> findAll(PageVO vo) throws Exception {
+	public Page<WebBoard> findAll(PageVO vo) {
 		return repo.findAll(repo.makePredicate(vo.getType(), vo.getKeyword()), vo.makePageable(vo.getPrimarykeyColumn()));
+	}
+	
+	public void save(WebBoard boardVO) {
+		repo.save(boardVO);
 	}
 
 }

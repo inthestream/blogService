@@ -20,7 +20,6 @@ import lombok.extern.java.Log;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Log
-@Commit
 public class TestWebBoardRepository {
 
 	@Autowired
@@ -31,6 +30,7 @@ public class TestWebBoardRepository {
 	int FIRST_PAGE = 0;
 	int SECOND_PAGE = 1;
 	int PAGE_SIZE = 20;
+	String primaryColumn = "bno";
 	
 	/*@Test
 	public void insertBoardDummies() {
@@ -46,34 +46,54 @@ public class TestWebBoardRepository {
 	}*/
 	
 	@Test
-	public void testFindAllMethod() {
-		Page<WebBoard> result = setPageableAndFindAllMethod(FIRST_PAGE, PAGE_SIZE, Direction.ASC, "bno");
+	public void testFindAll() {
+		
+		Page<WebBoard> result = setPageableAndFindAll(FIRST_PAGE, PAGE_SIZE, Direction.ASC, primaryColumn);
 		assertEquals(result.getContent().get(0).getBno(), FIRST_INDEX);
 		
-		result = setPageableAndFindAllMethod(SECOND_PAGE, PAGE_SIZE, Direction.ASC, "bno");
+		result = setPageableAndFindAll(SECOND_PAGE, PAGE_SIZE, Direction.ASC, primaryColumn);
 		assertEquals(result.getContent().get(0).getBno(), NEXT_INDEX);
 	}
 	
 	@Test
 	public void testFindAllWithPredicate() {
 		PAGE_SIZE = 5;
-		
-		Page<WebBoard> result = setPageableWithPredicateAndFindAllMethod(FIRST_PAGE, PAGE_SIZE, Direction.ASC, "bno"
-																		,"writer", "user10");
-		
+		String searchWord = "user10";
+		Page<WebBoard> result = setPageableWithPredicateAndFindAll(FIRST_PAGE, PAGE_SIZE, Direction.ASC, primaryColumn
+																		,"writer", searchWord);
 		result.getContent().forEach(o -> {
-			assertEquals(o.getWriter(), "user10");
+			assertEquals(o.getWriter(), searchWord);
 		});
+	}
+	
+	@Test
+	public void testSave() {
+		WebBoard board = new WebBoard();
+		board.setTitle("testTitle");
+		board.setContent("testContent");
+		board.setWriter("testWriter");
+		
+		Page<WebBoard> lastRow = setPageableAndFindAll(1, 1, Direction.DESC, primaryColumn);
+		Long lastId = lastRow.getContent().get(0).getBno();
+		
+		repo.save(board);		
+		
+		Page<WebBoard> lastRowAfterSave = setPageableAndFindAll(1, 1, Direction.DESC, primaryColumn);
+		Long lastIdAfterSave = lastRowAfterSave.getContent().get(0).getBno();
+		
+		lastId = lastId + 1L;
+		
+		assertEquals(lastId, lastIdAfterSave);
 		
 	}
 	
-	private Page<WebBoard> setPageableAndFindAllMethod(int pageIndex
+	private Page<WebBoard> setPageableAndFindAll(int pageIndex
 						, int pageSize, Direction direction, String columnName) {
 		Pageable pageable = PageRequest.of(pageIndex, pageSize, direction, columnName);
 		return repo.findAll(repo.makePredicate(null, null), pageable);
 	}
 	
-	private Page<WebBoard> setPageableWithPredicateAndFindAllMethod(int pageIndex
+	private Page<WebBoard> setPageableWithPredicateAndFindAll(int pageIndex
 				, int pageSize, Direction direction, String columnName, String type, String keyword) {
 		Pageable pageable = PageRequest.of(pageIndex, pageSize, direction, columnName);
 		return repo.findAll(repo.makePredicate(type, keyword), pageable);
