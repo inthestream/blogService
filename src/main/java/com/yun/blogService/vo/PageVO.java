@@ -15,7 +15,25 @@ public class PageVO {
 	private String keyword;
 	private String type;
 	
+	private Direction dir;
+	private String primarykeyColumn;
 	
+	public Direction getDir() {
+		return dir;
+	}
+
+	public void setDir(Direction dir) {
+		this.dir = dir;
+	}
+
+	public String getPrimarykeyColumn() {
+		return primarykeyColumn;
+	}
+
+	public void setPrimarykeyColumn(String primarykeyColumn) {
+		this.primarykeyColumn = primarykeyColumn;
+	}
+
 	public String getKeyword() {
 		return keyword;
 	}
@@ -53,7 +71,7 @@ public class PageVO {
 		this.size = size < DEFAULT_SIZE || size > DEFAULT_MAX_SIZE ? DEFAULT_SIZE : size;
 	}
 	
-	public Pageable makePageable(Direction direction, String... props) {
-		return PageRequest.of(this.page - 1, this.size, direction, props);
+	public Pageable makePageable(String... props) {
+		return PageRequest.of(this.page - 1, this.size, this.dir, props);
 	}
 }

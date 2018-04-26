@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.yun.blogService.domain.WebBoard;
 import com.yun.blogService.persistence.WebBoardRepository;
+import com.yun.blogService.service.WebBoardService;
 import com.yun.blogService.vo.PageMaker;
 import com.yun.blogService.vo.PageVO;
 
@@ -22,19 +23,19 @@ import lombok.extern.java.Log;
 @Log
 public class WebBoardController {
 
-
-	private WebBoardRepository repo;
+	public WebBoardService webBoardService;
 	
 	@Autowired
-	private void setWebBoardRepository(WebBoardRepository repo) {
-		this.repo = repo;
+	private void setWebBoardService(WebBoardService webBoardService) {
+		this.webBoardService = webBoardService;
 	}
 	
 	@GetMapping("/list")
-	public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
-		Pageable page = vo.makePageable(Direction.ASC, "bno");
+	public void list(@ModelAttribute("pageVO") PageVO vo, Model model) throws Exception {
+		vo.setDir(Direction.ASC);
+		vo.setPrimarykeyColumn("bno");
 		
-		Page<WebBoard> result = repo.findAll(repo.makePredicate(vo.getType(), vo.getKeyword()), page);
+		Page<WebBoard> result = webBoardService.findAll(vo);
 		
 		model.addAttribute("result", new PageMaker<WebBoard>(result));
 	}
