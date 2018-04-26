@@ -1,5 +1,7 @@
 package com.yun.blogService.service.Impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,8 @@ public class WebBoardServiceImpl implements WebBoardService {
 	}
 	
 	@Override
-	public void findOne() {
-		// TODO Auto-generated method stub
+	public Optional<WebBoard> findById(Long bno) {
+		return repo.findById(bno);
 		
 	}
 
